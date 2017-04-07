@@ -15,15 +15,12 @@ void initLeds()
   pinMode(PIN_RGB_V, OUTPUT);
   digitalWrite(PIN_RGB_V, HIGH);
   RGBLED.begin();
-  setRgbColor(0, 0, 0, 0);
+  turnOffRgb();
+  setRgbColor(0, 255, 255, 255);
 }
 
-void blinkLed()
-{
-  digitalWrite(PIN_LED, HIGH);
-  delay(250);
-  digitalWrite(PIN_LED, LOW);
-  delay(250);
+void turnOffRgb() {
+  setRgbColor(0, 255, 255, 255);
 }
 
 void setRgbColor(int brightness, int r, int g, int b) // 0~255
@@ -33,13 +30,185 @@ void setRgbColor(int brightness, int r, int g, int b) // 0~255
   RGBLED.show();
 }
 
-void testAlert()
+void blinkRgb(int mils)
 {
-  int brightness = 100;
-  int r = 0;
-  int g = 0;
-  int b = 0;
+  setRgbColor(50, 0, 255, 0); delay(mils/2);
+  turnOffRgb();               delay(mils/2);
+}
+
+void blinkType1(byte br, byte r, byte g, byte b)
+{
+  /* ●● ○○ ○○ ○○  ○○ ○○ ○○ ○○ */
+  int base_mils = 1000;
+  int blink_on_mils  =  30;
+  int blink_off_mils = 150;
   
-  setRgbColor(brightness, r, g, b);
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();             delay(blink_off_mils);
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();             delay(blink_off_mils);
+  delay(base_mils - blink_on_mils*2 - blink_off_mils*2);
+
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+}
+
+void blinkType2(byte br, byte r, byte g, byte b)
+{
+  /* ●○ ○○ ○○ ○○  ○○ ○○ ○○ ○○ */
+  int base_mils = 1000;
+  int blink_on_mils  =  50;
+  
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();
+  delay(base_mils - blink_on_mils);
+
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+}
+
+void blinkType3(byte br, byte r, byte g, byte b)
+{
+  /* ●● ○○ ○○ ○○  ●○ ○○ ○○ ○○ */
+  int base_mils = 1000;
+  int blink_on_mils  =  30;
+  int blink_off_mils = 150;
+  
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();             delay(blink_off_mils);
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();             delay(blink_off_mils);
+  delay(base_mils - blink_on_mils*2 - blink_off_mils*2);
+
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();             delay(blink_off_mils);
+  delay(base_mils - blink_on_mils - blink_off_mils);
+  
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+}
+
+void blinkType4(byte br, byte r, byte g, byte b)
+{
+  /* ●● ○○ ○○ ○○  ●● ○○ ○○ ○○ */
+  int base_mils = 1000;
+  int blink_on_mils  =  30;
+  int blink_off_mils = 150;
+  
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();             delay(blink_off_mils);
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();             delay(blink_off_mils);
+  delay(base_mils - blink_on_mils*2 - blink_off_mils*2);
+
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();             delay(blink_off_mils);
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();             delay(blink_off_mils);
+  delay(base_mils - blink_on_mils*2 - blink_off_mils*2);
+
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+}
+
+void blinkType5(byte br, byte r, byte g, byte b)
+{
+  /* ●○ ○○ ○○ ○○  ●○ ○○ ○○ ○○ */
+  int base_mils = 1000;
+  int blink_on_mils  =  50;
+  
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();
+  delay(base_mils - blink_on_mils);
+
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();
+  delay(base_mils - blink_on_mils);
+  
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+}
+
+void blinkType6(byte br, byte r, byte g, byte b)
+{
+  /* ～～ ～～ ～～ ～～  ○○ ○○ ○○ ○○ */
+  int base_mils = 1000;
+  int interval_mils = 50;
+
+  int steps = base_mils / interval_mils * 2;
+
+  for ( int i = 0; i < steps; i++) {
+    int _br = br / steps * i;
+    setRgbColor(_br, r, g, b);
+    delay(interval_mils);
+  }
+  for ( int i = 0; i < steps; i++) {
+    int _br = br / steps * (steps - i);
+    setRgbColor(_br, r, g, b);
+    delay(interval_mils);
+  }
+  turnOffRgb();
+
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+  delay(base_mils);
+}
+
+void blinkType7(byte br, byte r, byte g, byte b)
+{
+  /* ～～ ～～ ～～ ～～  ～～ ～～ ～～ ～～ */
+  int base_mils = 1000;
+  int interval_mils = 50;
+
+  int steps = base_mils / interval_mils * 2;
+
+  for ( int i = 0; i < steps; i++) {
+    int _br = br / steps * i;
+    setRgbColor(_br, r, g, b);
+    delay(interval_mils);
+  }
+  for ( int i = 0; i < steps; i++) {
+    int _br = br / steps * (steps - i);
+    setRgbColor(_br, r, g, b);
+    delay(interval_mils);
+  }
+  for ( int i = 0; i < steps; i++) {
+    int _br = br / steps * i;
+    setRgbColor(_br, r, g, b);
+    delay(interval_mils);
+  }
+  for ( int i = 0; i < steps; i++) {
+    int _br = br / steps * (steps - i);
+    setRgbColor(_br, r, g, b);
+    delay(interval_mils);
+  }
 }
 
