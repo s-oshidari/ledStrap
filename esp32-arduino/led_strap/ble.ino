@@ -1,6 +1,7 @@
 void bleStartAdv()
 {
   gatt.begin("OSHIRASE Strap");
+  gatt.setConnectCallback(handleConnectCallback);
   gatt.setReadCallback(handleReadCallback);
   gatt.setWriteCallback(handleWriteCallback);
 }
@@ -10,6 +11,17 @@ void bleStop()
   if (btStarted()) {
     btStop();
   }
+}
+
+void handleConnectCallback(esp_ble_gatts_cb_param_t *param)
+{
+  Serial.printf("SERVICE_START_EVT, conn_id %d, remote %02x:%02x:%02x:%02x:%02x:%02x:, is_conn %d\n",
+           param->connect.conn_id,
+           param->connect.remote_bda[0], param->connect.remote_bda[1], param->connect.remote_bda[2],
+           param->connect.remote_bda[3], param->connect.remote_bda[4], param->connect.remote_bda[5],
+           param->connect.is_connected);
+
+  blinkConnected();
 }
 
 void handleReadCallback(esp_ble_gatts_cb_param_t *param)
@@ -29,10 +41,15 @@ void handleWriteCallback(esp_ble_gatts_cb_param_t *param)
   }
   
   // parse color info
-  /*
   uint16_t len = param->write.len;
   uint8_t *val = param->write.value;
 
+  for (int i = 0; i < len; i++) {
+    Serial.print(val[i], HEX);
+    Serial.print(" ");
+  }
+  Serial.println();
+  
   uint8_t d_ver = val[0];
   switch (d_ver) {
     case 1:
@@ -42,20 +59,6 @@ void handleWriteCallback(esp_ble_gatts_cb_param_t *param)
       Serial.println("Undefined data version: " + (String)d_ver );
       alertAndSleepError(SECS_ONE_YEAR);
   }
-  */
-  
-  // test
-  int _id = 6;
-  int _mins = 15;
-  int _num = 3;
-  uint8_t header[9] = {1, 1, _num, _mins, 0, 0, 0, 0, 0};
-  uint8_t body1[9]  = {1, 0, _num, _mins, _id, 50, 255, 0, 0};
-  uint8_t body2[9]  = {1, 0, _num, _mins, _id, 50, 0, 255, 0};
-  uint8_t body3[9]  = {1, 0, _num, _mins, _id, 50, 0, 0, 255};
-  handleColorData_v1(9, header);
-  handleColorData_v1(9, body1);
-  handleColorData_v1(9, body2);
-  handleColorData_v1(9, body3);
 }
 
 void checkDataLength(uint16_t len_test, uint16_t len_correct)
@@ -113,7 +116,7 @@ void handleColorData_v1(uint16_t len, uint8_t *val)
   int secsToEnd = currentSecs + (d_minsTillNextCheck * 60);
   
   while (currentSecs < secsToEnd) {
-    Serial.print("Current: "); Serial.println(currentSecs);
+    Serial.print("Current: "); Serial.print(currentSecs);
     Serial.print("  ToEnd: "); Serial.println(secsToEnd);
     
     for ( auto blinkInfo = blinkInfoSet.begin(); blinkInfo != blinkInfoSet.end(); ++blinkInfo) {
@@ -132,6 +135,12 @@ void handleColorData_v1(uint16_t len, uint8_t *val)
           break;
         case 5:
           blinkType5( (*blinkInfo).brightness, (*blinkInfo).r, (*blinkInfo).g, (*blinkInfo).b );
+          break;
+        case 6:
+          blinkType6( (*blinkInfo).brightness, (*blinkInfo).r, (*blinkInfo).g, (*blinkInfo).b );
+          break;
+        case 7:
+          blinkType7( (*blinkInfo).brightness, (*blinkInfo).r, (*blinkInfo).g, (*blinkInfo).b );
           break;
         default:
           Serial.println("Undefined blink type: " + (String)(*blinkInfo).blinkPatternId );

@@ -7,6 +7,7 @@ String _local_name;
 
 ///Declare the static function
 static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
+static void (*_handleConnectCallback)(esp_ble_gatts_cb_param_t *param);
 static void (*_handleReadCallback)(esp_ble_gatts_cb_param_t *param);
 static void (*_handleWriteCallback)(esp_ble_gatts_cb_param_t *param);
 
@@ -18,6 +19,33 @@ static void (*_handleWriteCallback)(esp_ble_gatts_cb_param_t *param);
 #define TEST_MANUFACTURER_DATA_LEN  17
 
 #define GATTS_DEMO_CHAR_VAL_LEN_MAX 0x40
+
+String esp_gatts_cb_event_codes[] = {
+  "ESP_GATTS_REG_EVT",
+  "ESP_GATTS_READ_EVT",
+  "ESP_GATTS_WRITE_EVT",
+  "ESP_GATTS_EXEC_WRITE_EVT",
+  "ESP_GATTS_MTU_EVT",
+  "ESP_GATTS_CONF_EVT",
+  "ESP_GATTS_UNREG_EVT",
+  "ESP_GATTS_CREATE_EVT",
+  "ESP_GATTS_ADD_INCL_SRVC_EVT",
+  "ESP_GATTS_ADD_CHAR_EVT",
+  "ESP_GATTS_ADD_CHAR_DESCR_EVT",
+  "ESP_GATTS_DELETE_EVT",
+  "ESP_GATTS_START_EVT",
+  "ESP_GATTS_STOP_EVT",
+  "ESP_GATTS_CONNECT_EVT",
+  "ESP_GATTS_DISCONNECT_EVT",
+  "ESP_GATTS_OPEN_EVT",
+  "ESP_GATTS_CANCEL_OPEN_EVT",
+  "ESP_GATTS_CLOSE_EVT",
+  "ESP_GATTS_LISTEN_EVT",
+  "ESP_GATTS_CONGEST_EVT",
+  "ESP_GATTS_RESPONSE_EVT",
+  "ESP_GATTS_CREAT_ATTR_TAB_EVT",
+  "ESP_GATTS_SET_ATTR_VAL_EVT"
+};
 
 uint8_t char1_str[] = {0x11,0x22,0x33};
 esp_attr_value_t gatts_demo_char1_val = 
@@ -37,12 +65,13 @@ static uint8_t raw_scan_rsp_data[] = {
         0x45, 0x4d, 0x4f, 0x02, 0x0a, 0xeb, 0x03, 0x03, 0xab, 0xcd
 };
 #else
-static uint8_t test_service_uuid128[32] = {
+//static uint8_t test_service_uuid128[32] = {
+static uint8_t test_service_uuid128[16] = {
     /* LSB <--------------------------------------------------------------------------------> MSB */
     //first uuid, 16bit, [12],[13] is the value
     0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xAB, 0xCD, 0x00, 0x00,
     //second uuid, 32bit, [12], [13], [14], [15] is the value
-    0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xAB, 0xCD, 0xAB, 0xCD,
+    //0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xAB, 0xCD, 0xAB, 0xCD,
 };
 
 //static uint8_t test_manufacturer[TEST_MANUFACTURER_DATA_LEN] =  {0x12, 0x23, 0x45, 0x56};
@@ -57,7 +86,8 @@ static esp_ble_adv_data_t test_adv_data = {
     .p_manufacturer_data =  NULL, //&test_manufacturer[0],
     .service_data_len = 0,
     .p_service_data = NULL,
-    .service_uuid_len = 32,
+//    .service_uuid_len = 32,
+    .service_uuid_len = 16,
     .p_service_uuid = test_service_uuid128,
     .flag = (ESP_BLE_ADV_FLAG_GEN_DISC | ESP_BLE_ADV_FLAG_BREDR_NOT_SPT),
 };
@@ -74,7 +104,7 @@ static esp_ble_adv_params_t test_adv_params = {
     .adv_filter_policy  = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
 };
 
-#define PROFILE_NUM 2
+#define PROFILE_NUM 1
 #define PROFILE_A_APP_ID 0
 
 struct gatts_profile_inst {
@@ -124,6 +154,7 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
 }
 
 static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param) {
+    Serial.println("callback event: " + esp_gatts_cb_event_codes[event] + " (" + (String)event + ")");
     switch (event) {
     case ESP_GATTS_REG_EVT:
         ESP_LOGI(GATTS_TAG, "REGISTER_APP_EVT, status %d, app_id %d\n", param->reg.status, param->reg.app_id);
@@ -229,6 +260,10 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
                  param->connect.remote_bda[3], param->connect.remote_bda[4], param->connect.remote_bda[5],
                  param->connect.is_connected);
         gl_profile_tab[PROFILE_A_APP_ID].conn_id = param->connect.conn_id;
+
+        // handle CONNECT
+        _handleConnectCallback(param);
+
         break;
     case ESP_GATTS_DISCONNECT_EVT:
         esp_ble_gap_start_advertising(&test_adv_params);
@@ -300,6 +335,11 @@ void app_main()
     esp_ble_gatts_app_register(PROFILE_A_APP_ID);
 
     return;
+}
+
+void GattServer::setConnectCallback(void (*handleConnectCallback)(esp_ble_gatts_cb_param_t*))
+{
+  _handleConnectCallback = handleConnectCallback;
 }
 
 void GattServer::setReadCallback(void (*handleReadCallback)(esp_ble_gatts_cb_param_t*))

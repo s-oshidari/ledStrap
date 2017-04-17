@@ -36,6 +36,22 @@ void blinkRgb(int mils)
   turnOffRgb();               delay(mils/2);
 }
 
+void blinkConnected()
+{
+  byte br = 50;
+  byte r =   0;
+  byte g =   0;
+  byte b = 255;
+  
+  int blink_on_mils  =  30;
+  int blink_off_mils = 150;
+
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();             delay(blink_off_mils);
+  setRgbColor(br, r, g, b); delay(blink_on_mils);
+  turnOffRgb();
+}
+
 void blinkType1(byte br, byte r, byte g, byte b)
 {
   /* ●● ○○ ○○ ○○  ○○ ○○ ○○ ○○ */

@@ -21,7 +21,6 @@
 #include "esp_gatts_api.h"
 #include "esp_bt_defs.h"
 #include "esp_bt_main.h"
-#include "esp_bt_main.h"
 
 #include "Arduino.h"
 
@@ -29,6 +28,7 @@ class GattServer {
   public:
     GattServer(void);
 //  ~GattServer(void);
+    void setConnectCallback(void (*handleConnectCallback)(esp_ble_gatts_cb_param_t*));
     void setReadCallback(void (*handleReadCallback)(esp_ble_gatts_cb_param_t*));
     void setWriteCallback(void (*handleWriteCallback)(esp_ble_gatts_cb_param_t*));
 
