@@ -1,8 +1,8 @@
 #include <Adafruit_NeoPixel.h>
 
 #define PIN_LED   14
-#define PIN_RGB_C 16
-#define PIN_RGB_V 17
+#define PIN_RGB_C 23
+#define PIN_RGB_V 22
 
 Adafruit_NeoPixel RGBLED = Adafruit_NeoPixel(1, PIN_RGB_C, NEO_RGB + NEO_KHZ800);
 
@@ -177,7 +177,9 @@ void blinkType6(byte br, byte r, byte g, byte b)
   /* ～～ ～～ ～～ ～～  ○○ ○○ ○○ ○○ */
   int base_mils = 1000;
   int interval_mils = 50;
+  int base_up = 20;
 
+  br = br + 20;
   int steps = base_mils / interval_mils * 2;
 
   for ( int i = 0; i < steps; i++) {
@@ -203,7 +205,9 @@ void blinkType7(byte br, byte r, byte g, byte b)
   /* ～～ ～～ ～～ ～～  ～～ ～～ ～～ ～～ */
   int base_mils = 1000;
   int interval_mils = 50;
+  int base_up = 20;
 
+  br = br + 20;
   int steps = base_mils / interval_mils * 2;
 
   for ( int i = 0; i < steps; i++) {
