@@ -35,11 +35,6 @@ void handleWriteCallback(esp_ble_gatts_cb_param_t *param)
   Serial.printf("GATT_WRITE_EVT, conn_id %d, trans_id %d, handle %d\n", param->write.conn_id, param->write.trans_id, param->write.handle);
   Serial.printf("GATT_WRITE_EVT, value len %d, value %08x\n", param->write.len, *(uint32_t *)param->write.value);
 
-  if ( isDataReceived ) {
-    Serial.println("Colorset data already received");
-    return;
-  }
-  
   // parse color info
   uint16_t len = param->write.len;
   uint8_t *val = param->write.value;
@@ -112,46 +107,9 @@ void handleColorData_v1(uint16_t len, uint8_t *val)
   isDataReceived = true;
   numOfColorsetReceived = 0;
 
-  int currentSecs = (millis() / 1000);
-  int secsToEnd = currentSecs + (d_minsTillNextCheck * 60);
-  
-  while (currentSecs < secsToEnd) {
-    Serial.print("Current: "); Serial.print(currentSecs);
-    Serial.print("  ToEnd: "); Serial.println(secsToEnd);
-    
-    for ( auto blinkInfo = blinkInfoSet.begin(); blinkInfo != blinkInfoSet.end(); ++blinkInfo) {
-      switch ((*blinkInfo).blinkPatternId) {
-        case 1:
-          blinkType1( (*blinkInfo).brightness, (*blinkInfo).r, (*blinkInfo).g, (*blinkInfo).b );
-          break;
-        case 2:
-          blinkType2( (*blinkInfo).brightness, (*blinkInfo).r, (*blinkInfo).g, (*blinkInfo).b );
-          break;
-        case 3:
-          blinkType3( (*blinkInfo).brightness, (*blinkInfo).r, (*blinkInfo).g, (*blinkInfo).b );
-          break;
-        case 4:
-          blinkType4( (*blinkInfo).brightness, (*blinkInfo).r, (*blinkInfo).g, (*blinkInfo).b );
-          break;
-        case 5:
-          blinkType5( (*blinkInfo).brightness, (*blinkInfo).r, (*blinkInfo).g, (*blinkInfo).b );
-          break;
-        case 6:
-          blinkType6( (*blinkInfo).brightness, (*blinkInfo).r, (*blinkInfo).g, (*blinkInfo).b );
-          break;
-        case 7:
-          blinkType7( (*blinkInfo).brightness, (*blinkInfo).r, (*blinkInfo).g, (*blinkInfo).b );
-          break;
-        default:
-          Serial.println("Undefined blink type: " + (String)(*blinkInfo).blinkPatternId );
-          alertAndSleepError(SECS_ONE_YEAR);
-      }
-    }
-    
-    currentSecs = (millis() / 1000);
+  if (isBlinking) {
+    vTaskDelete(taskBlink);
   }
-
-  Serial.println("Blink iteration completed...will check again in no time");
-  enterDeepSleep(0);
+  xTaskCreate(&blinkByType, "blinkByType", 2048, (void *)d_minsTillNextCheck, 1, &taskBlink);
 }
 

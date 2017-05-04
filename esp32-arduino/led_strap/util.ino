@@ -43,4 +43,8 @@ void alertAndSleepBleNoData(uint32_t secs)
   alertAndSleep(secs, 2, 0, 255, 0);
 }
 
+void delayTask(int mils)
+{
+  vTaskDelay(mils / portTICK_RATE_MS);
+}
 

@@ -17,8 +17,12 @@ struct BlinkInfo {
 std::vector<BlinkInfo> blinkInfoSet;
 GattServer gatt;
 
-bool isDataReceived = false;
 int numOfColorsetReceived = 0;
+
+bool isDataReceived = false;
+bool isBlinking = false;
+TaskHandle_t taskBlink;
+void blinkByType(void *p);
 
 void setup()
 {

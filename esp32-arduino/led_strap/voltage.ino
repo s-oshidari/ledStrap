@@ -18,7 +18,7 @@ float getVoltage()
   float v = vTotal / loopCnt;
   digitalWrite(PIN_VOLT_SEND, LOW);
 
-  float volt = (1.0273 * v + 496.65) / 1000;
+  float volt = (1.0273 * v + 596.65) / 1000;
   Serial.println("Voltage: " + (String)volt);
 //  Serial.println("v: " + (String)v);
   return volt;
