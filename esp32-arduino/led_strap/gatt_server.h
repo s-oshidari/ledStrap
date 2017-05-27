@@ -29,7 +29,7 @@ class GattServer {
     GattServer(void);
 //  ~GattServer(void);
     void setConnectCallback(void (*handleConnectCallback)(esp_ble_gatts_cb_param_t*));
-    void setReadCallback(void (*handleReadCallback)(esp_ble_gatts_cb_param_t*));
+    void setReadCallback(void (*handleReadCallback)(esp_ble_gatts_cb_param_t*, esp_gatt_value_t*));
     void setWriteCallback(void (*handleWriteCallback)(esp_ble_gatts_cb_param_t*));
 
     bool begin(String localName=String());

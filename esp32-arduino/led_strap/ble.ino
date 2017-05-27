@@ -24,10 +24,16 @@ void handleConnectCallback(esp_ble_gatts_cb_param_t *param)
   blinkConnected();
 }
 
-void handleReadCallback(esp_ble_gatts_cb_param_t *param)
+void handleReadCallback(esp_ble_gatts_cb_param_t *param, esp_gatt_value_t *attr_value)
 {
   Serial.printf("GATT_READ_EVT, conn_id %d, trans_id %d, handle %d\n", param->read.conn_id, param->read.trans_id, param->read.handle);
-  // nothing to do here...
+
+  uint32_t n = (uint32_t)(voltage * 100);
+  attr_value->len = 4;
+  attr_value->value[0] = (n >> 24) & 0xFF;
+  attr_value->value[1] = (n >> 16) & 0xFF;
+  attr_value->value[2] = (n >>  8) & 0xFF;
+  attr_value->value[3] = (n >>  0) & 0xFF;
 }
 
 void handleWriteCallback(esp_ble_gatts_cb_param_t *param)

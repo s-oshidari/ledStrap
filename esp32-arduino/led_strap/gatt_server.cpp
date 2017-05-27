@@ -8,7 +8,7 @@ String _local_name;
 ///Declare the static function
 static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t *param);
 static void (*_handleConnectCallback)(esp_ble_gatts_cb_param_t *param);
-static void (*_handleReadCallback)(esp_ble_gatts_cb_param_t *param);
+static void (*_handleReadCallback)(esp_ble_gatts_cb_param_t *param, esp_gatt_value_t *attr_value);
 static void (*_handleWriteCallback)(esp_ble_gatts_cb_param_t *param);
 
 #define GATTS_SERVICE_UUID_TEST_A   0x00FF
@@ -178,15 +178,18 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     esp_gatt_rsp_t rsp;
     memset(&rsp, 0, sizeof(esp_gatt_rsp_t));
     rsp.attr_value.handle = param->read.handle;
+
+    // handle READ
+    _handleReadCallback(param, &(rsp.attr_value));
+    /*
     rsp.attr_value.len = 4;
     rsp.attr_value.value[0] = 0xde;
     rsp.attr_value.value[1] = 0xed;
     rsp.attr_value.value[2] = 0xbe;
     rsp.attr_value.value[3] = 0xef;
+    */
     esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id,
                   ESP_GATT_OK, &rsp);
-    // handle READ
-    _handleReadCallback(param);
     
     break;
   }
@@ -344,7 +347,7 @@ void GattServer::setConnectCallback(void (*handleConnectCallback)(esp_ble_gatts_
   _handleConnectCallback = handleConnectCallback;
 }
 
-void GattServer::setReadCallback(void (*handleReadCallback)(esp_ble_gatts_cb_param_t*))
+void GattServer::setReadCallback(void (*handleReadCallback)(esp_ble_gatts_cb_param_t*, esp_gatt_value_t*))
 {
   _handleReadCallback = handleReadCallback;
 }

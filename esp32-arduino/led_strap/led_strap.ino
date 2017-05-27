@@ -18,6 +18,7 @@ std::vector<BlinkInfo> blinkInfoSet;
 GattServer gatt;
 
 int numOfColorsetReceived = 0;
+float voltage = 0;
 
 bool isDataReceived = false;
 bool isBlinking = false;
@@ -31,9 +32,10 @@ void setup()
   initLeds();
 
   /* check if there is enought voltage supplied */
-  if ( getVoltage() < 2.2 ) {
+  voltage = getVoltage();
+  if ( voltage < 2.2 ) {
     Serial.println("Battery is too low...going into deep sleep");
-//    alertAndSleepLowBattery(SECS_ONE_YEAR);
+    alertAndSleepLowBattery(SECS_ONE_YEAR);
   }
 
   /* start advertising */
@@ -44,7 +46,7 @@ void setup()
   while ( !isDataReceived ) {
     // go into deep-sleep when timeout
     if (elapsedSecs > SECS_WAIT_FOR_BLE_CONN) {
-      Serial.println("Failed to connect to the BLE central...going into deep sleep");
+//      Serial.println("Failed to connect to the BLE central...going into deep sleep");
 //      alertAndSleepBleConnFailed(SECS_WAIT_BLE_CONN_FAILED);
     }
     delay(1000);
