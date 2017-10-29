@@ -13,12 +13,11 @@ void count(int secs)
 }
 
 void alertAndSleep(uint32_t secs, int cnt, int r, int g, int b,
-                   int int_on = 100, int int_off = 500)
+                   int int_on = 200, int int_off = 600)
 {
-  turnOffRgb();
   for (int i = 0; i < cnt; i++) {
-    setRgbColor(255, r, g, b); delay(int_on);
-    setRgbColor(  0, r, g, b); delay(int_off);
+    setRgbColor(150, r, g, b); delay(int_on);
+    setRgbColor(  0, 0, 0, 0); delay(int_off);
   }
   enterDeepSleep(secs);
 }
@@ -40,7 +39,7 @@ void alertAndSleepError(uint32_t secs)
 
 void alertAndSleepBleNoData(uint32_t secs)
 {
-  alertAndSleep(secs, 2, 0, 255, 0);
+  alertAndSleep(secs, 2, 255, 255, 255);
 }
 
 void delayTask(int mils)

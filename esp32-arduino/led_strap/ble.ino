@@ -1,6 +1,6 @@
 void bleStartAdv()
 {
-  gatt.begin("OSHIRASE Strap");
+  gatt.begin("OSHIRASE Strap Kumamon");
   gatt.setConnectCallback(handleConnectCallback);
   gatt.setReadCallback(handleReadCallback);
   gatt.setWriteCallback(handleWriteCallback);
@@ -87,6 +87,7 @@ void handleColorData_v1(uint16_t len, uint8_t *val)
   if ( d_numOfColorset == 0 ) {
     Serial.println("Received data contains no colorset");
     alertAndSleepBleNoData(d_minsTillNextCheck * 60);
+    return;
   }
 
   if ( d_isHeader ) {

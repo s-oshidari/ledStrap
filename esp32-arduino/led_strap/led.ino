@@ -1,32 +1,28 @@
 #include <Adafruit_NeoPixel.h>
 
-#define PIN_LED   14
-#define PIN_RGB_C 23
-#define PIN_RGB_V 22
+#define PIN_RGB_C 22
+#define PIN_RGB_V 23
 
 Adafruit_NeoPixel RGBLED = Adafruit_NeoPixel(1, PIN_RGB_C, NEO_RGB + NEO_KHZ800);
 
 void initLeds()
 {
-  // White
-  pinMode(PIN_LED, OUTPUT);
-
-  // RGB
+  RGBLED.begin();
   pinMode(PIN_RGB_V, OUTPUT);
   digitalWrite(PIN_RGB_V, HIGH);
-  RGBLED.begin();
   turnOffRgb();
-  setRgbColor(0, 255, 255, 255);
 }
 
-void turnOffRgb() {
-  setRgbColor(0, 255, 255, 255);
+void turnOffRgb()
+{
+  setRgbColor(0, 0, 0, 0);
 }
 
 void setRgbColor(int brightness, int r, int g, int b) // 0~255
 {
   RGBLED.setBrightness(brightness);
   RGBLED.setPixelColor(0, r, g, b);
+  RGBLED.show();
   RGBLED.show();
 }
 
@@ -85,7 +81,7 @@ void blinkByType(void *p)
     }
     currentSecs = (millis() / 1000);
   }
-
+  
   Serial.println("Blink iteration completed...will check again in no time");
   enterDeepSleep(0);
 }

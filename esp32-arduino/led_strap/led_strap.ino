@@ -46,16 +46,17 @@ void setup()
   while ( !isDataReceived ) {
     // go into deep-sleep when timeout
     if (elapsedSecs > SECS_WAIT_FOR_BLE_CONN) {
-//      Serial.println("Failed to connect to the BLE central...going into deep sleep");
-//      alertAndSleepBleConnFailed(SECS_WAIT_BLE_CONN_FAILED);
+      Serial.println("Failed to connect to the BLE central...going into deep sleep");
+      alertAndSleepBleConnFailed(SECS_WAIT_BLE_CONN_FAILED);
     }
     delay(1000);
+    Serial.print(".");
     elapsedSecs++;
   }
 
   /* Data received successfully through BLE */
   Serial.println("BLE data received successfully");
-//  bleStop();
+  bleStop();
 }
 
 void loop()
